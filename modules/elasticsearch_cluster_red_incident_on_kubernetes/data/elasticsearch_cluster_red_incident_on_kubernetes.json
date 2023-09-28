@@ -1,0 +1,150 @@
+{
+  "name": "elasticsearch_cluster_red_incident_on_kubernetes",
+  "description": "The Elasticsearch Cluster Red incident occurs when the Elasticsearch cluster is experiencing issues and is in a critical state. This can cause interruptions to the functionality of various systems that rely on Elasticsearch. Immediate attention is required to resolve the issue and restore the Elasticsearch cluster to a healthy state.",
+  "params": [
+    {
+      "name": "ELASTICSEARCH_POD_IP",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_DEPLOYMENT_NAME",
+      "value": ""
+    },
+    {
+      "name": "CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_POD_NAME",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_NAMESPACE",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Elasticsearch Cluster Red Incident on Kubernetes.\nThe Elasticsearch Cluster Red incident occurs when the Elasticsearch cluster is experiencing issues and is in a critical state. This can cause interruptions to the functionality of various systems that rely on Elasticsearch. Immediate attention is required to resolve the issue and restore the Elasticsearch cluster to a healthy state."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Get the name of the Elasticsearch cluster"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get elasticsearch`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Describe the Elasticsearch cluster to get more details"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe elasticsearch ${CLUSTER_NAME}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the Elasticsearch cluster health"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE | `curl -s -X GET http://localhost:9200/_cluster/health`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the Elasticsearch cluster status"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE | `curl -s -X GET http://localhost:9200/_cat/health`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the Elasticsearch cluster logs"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl logs ${ELASTICSEARCH_POD_NAME} --namespace=${ELASTICSEARCH_NAMESPACE}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the Elasticsearch cluster configuration for any errors"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE | `cat /usr/share/elasticsearch/config/elasticsearch.yml`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the Elasticsearch cluster nodes"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE | `curl -s -X GET http://localhost:9200/_cat/nodes?v`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Network issues: Elasticsearch cluster red status can also be caused by network issues. This can occur when there are network connectivity issues between the nodes in the cluster or when the network is not properly configured."
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | random=1 | limit=1 | invoke_check_es_network_connectivity($ELASTICSEARCH_POD_IP)"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Restart Elasticsearch nodes: If the issue is minor and isolated to a few nodes, restarting the nodes can help resolve the issue. However, if the issue is more severe, restarting the entire cluster may be necessary."
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | random=1 | limit=1 | invoke_restart_elasticsearch_deploy($ELASTICSEARCH_DEPLOYMENT_NAME, $ELASTICSEARCH_NAMESPACE, $NAMESPACE)"
+    }
+  ]
+}
